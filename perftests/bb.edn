@@ -1,0 +1,7 @@
+{:paths ["src"]
+ :tasks {:requires    ()
+
+         init {:doc "init"}
+
+         repl {:doc  "Run Clojure repl for Emacs with cider"
+               :task (clojure "-M:cider/nrepl")}}}

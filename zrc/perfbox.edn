@@ -1,0 +1,19 @@
+{ns perfbox
+
+ test
+ {:zen/tags #{zen/tag}
+
+  }
+
+ suite
+ {:zen/tags #{zen/tag}
+
+  }
+
+ run
+ {:zen/tags #{zen/tag}
+
+  }
+
+
+ }

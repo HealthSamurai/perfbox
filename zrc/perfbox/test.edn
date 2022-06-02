@@ -1,0 +1,95 @@
+{ns perfbox.test
+
+ import #{perfbox}
+
+ simple
+ {:zen/tags #{perfbox/test}
+  :init  #_[{:method :post :uri "/$sql" :data "truncate patient"}
+            {:method :post :uri "/$sql" :data "truncate encounter"}
+            {:method :post
+             :uri "/$sql"
+             :data "
+                  CREATE INDEX patient_name_trgm_idx  on patient
+                  USING gin (
+                    (aidbox_text_search(knife_extract_text(\"patient\".resource,
+                      $JSON$[[\"name\",\"family\"],[\"name\",\"given\"],[\"name\",\"middle\"],[\"name\",\"text\"]]$JSON$)))
+                  gin_trgm_ops
+                  );"}
+            {:method :post
+             :uri "/$sql"
+             :data "
+            CREATE INDEX patient_family_trgm_idx  on patient
+            USING gin (
+                      (aidbox_text_search(knife_extract_text(\"patient\".resource,
+                                                            $JSON$[[\"name\",\"family\"]]$JSON$)))
+
+            gin_trgm_ops
+            );"}
+            {:method :post
+             :uri "/$sql"
+             :data "
+            CREATE INDEX patient_birthday_btree_idx ON patient
+            (
+              (knife_extract_min_timestamptz(resource, '[[\"birthDate\"]]'::jsonb)),
+              (knife_extract_max_timestamptz(resource, '[[\"birthDate\"]]'::jsonb)) DESC
+            );"}
+            {:method :post
+             :uri "/$sql"
+             :data "ANALYZE patient;"}]
+
+  :steps [{:method :put
+           :action "PUT /Patient/?"
+           :uri (str "/Patient/pt-" i)
+           :data {:resourceType "Patient"
+                  :id (str "pt-" i)
+                  :birthDate "1980-03-05"
+                  :gender (if (odd? i) "male" "female")
+                  :name [{:family (str "patient" i)
+                          :given [(str "given" i)]}]
+                  :address [{:line [(str "line" i)]}]}}
+          {:method :get
+           :action "GET /Patient/?"
+           :uri (str "/Patient/pt-" i)}
+          {:method :put
+           :action "PUT /Encounter/?"
+           :uri (str "/Encounter/enc-" i)
+           :data {:resourceType "Encounter"
+                  :id (str "enc-" i)
+                  :class {:code "class"}
+                  :status "finished"}}
+          {:method :get
+           :action "GET /Encounter/?"
+           :uri (str "/Encounter/enc-" i)}
+          {:method :get
+           :action "GET /Patient/?"
+           :uri "/Patient"
+           :params {:name (str "patient" i)
+                    :birthdate "1980-03-05"
+                    :_total "count"}}
+          {:method :get
+           :action "GET /Patient/?"
+           :uri "/Patient"
+           :params {:family (str "patient" i)
+                    :_total "count"}}]}
+
+ suite
+ {:zen/tags #{perfbox/suite}
+  :prometheus {:pushgateway ""}
+  :threads [2 4 8 16]
+  :ops 5000
+  :tests [simple]}
+
+
+ aidbox
+ {:zen/tags #{perfbox/subject}
+  :zen/desc "Test aidbox"
+  :url "http://localhost:8765"
+  :basic-auth ["root" "secret"] ;; [(env :AIDBOX_CLIENT_ID) (env :AIDBOX_CLIENT_SECRET)]
+  :suites #{suite}}
+
+ hapi
+ {:zen/tags #{perfbox/subject}
+  :zen/desc "Test HAPI"
+  :url "http://localhost:8090"
+  :prefix "/fhir"
+  :suites #{suite}}}

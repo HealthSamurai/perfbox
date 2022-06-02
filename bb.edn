@@ -1,0 +1,13 @@
+{:tasks {:requires    ([babashka.fs :as fs])
+         build        {:doc  "Build public infrabox jar"
+                       :task (clojure "-X:uber :jar target/infrabox.jar :main-class infrab.core :aot true :compile-ns :all :version '0.1'")}
+
+         publish      {:doc  "Build public infrabox jar"
+                       :task (shell "clj -A:build  -X build/run")}
+
+         run-repl         {:doc  "Run Clojure repl for Emacs with cider"
+                       :task (clojure "-M:cider/nrepl:build")}
+
+         lint         {:doc  "Lint source code"
+                       :task (do (shell "clj-kondo --parallel --lint src:test:dev/src")
+                                 (shell "cljstyle check"))}}}

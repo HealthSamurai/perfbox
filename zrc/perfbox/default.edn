@@ -1,0 +1,29 @@
+{ns perfbox.default
+
+ basic-op
+ {:steps [{:method :put
+           :uri (str "/Patient/pt-" 'i)
+           :data {:resourceType "Patient"
+                  :id (str "pt-" i)
+                  :birthDate ""
+                  :name [{:family (str "patient" i)}]}}]}
+
+ suite
+ {:prometheus {:pushgateway ""}
+  :number-of-threads [2 4 8 16 32]
+  :number-of-ops 100
+  :operations #{basic-op}}
+
+ aidbox
+ {:zen/desc "Test aidbox"
+  :url ""
+  :basic-auth [(env :AIDBOX_CLIENT_ID) (env :AIDBOX_CLIENT_SECRET)]
+  :init [{:uri "/$sql" :data ""}]
+  :suites #{suite}}
+
+ hapi
+ {:zen/desc "Test HAPI"
+  :description ""
+  :url ""
+  :basic-auth ["" ""]
+  :suites #{suite}}}

@@ -1,0 +1,576 @@
+{ns perfbox.innovaccer
+ import #{perfbox}
+
+ AllergyIntolerance
+ {:zen/tags #{perfbox/test}
+
+  :steps [{:method :get
+           :action "AllergyIntoleranceby Patient"
+           :uri "/AllergyIntolerance"
+           :params {:patient (get-in persist-store [:patient-id
+                                                    (mod i (count (:patient-id persist-store)))
+                                                    :id])}}
+          {:method :get
+           :action "AllergyIntoleranceby Patient & Criticality"
+           :uri "/AllergyIntolerance"
+           :params {:patient (get-in persist-store [:patient-id
+                                                       (mod i (count (:patient-id persist-store)))
+                                                       :id])
+                    :criticality (rand-nth ["low" "high" "unable-to-assess"])}}
+          #_{:method :get
+           :action "AllergyIntoleranceby criticality & date"
+           :uri (format "/AllergyIntolerance?criticality=%s&date=%s2021&_count=1"
+                        (rand-nth ["low" "high" "unable-to-assess"])
+                        (rand-nth ["gt" "lt"]))}]}
+
+ CarePlan
+ {:zen/tags #{perfbox/test}
+  :steps [{:method :get
+           :action "CarePlan by patient"
+           :uri "/CarePlan"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])}}
+
+          {:method :get
+           :action "CarePlan by patient include patient"
+           :uri "/CarePlan"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :_include "subject:Patient"}}
+
+
+          {:method :get
+           :action "CarePlan by patient with category"
+           :uri "/CarePlan"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :category (rand-nth ["assess-plan" "unk"])
+
+                    }}
+          ]}
+
+ CareTeam
+ {:zen/tags #{perfbox/test}
+  :steps [{:method :get
+           :action "CareTeam by patient"
+           :uri "/CareTeam"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])}}
+
+          {:method :get
+           :action "CareTeam by patient with status"
+           :uri "/CareTeam"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :category (rand-nth ["active" "inactive" "unk"])
+
+                    }}]}
+
+ Condition
+ {:zen/tags #{perfbox/test}
+
+  :steps [{:method :get
+           :action "Condition by patient"
+           :uri "/Condition"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])}}
+
+          {:method :get
+           :action "Condition by patient with code"
+           :uri "/Condition"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :code (rand-nth ["19169002" "92691004" "25064002" "446654005"
+                                     "236077008" "314994000" "428251008" "5251000175109"
+                                     "70704007" "840539006" "24079001" "301011002" "84229001"
+                                     "105531004" "110030002" "233604007" "386661006" "59621000"
+                                     "58150001" "271825005" "40055000" "284549007" "254637007"
+                                     "192127007" "74400008" "unk" "unk-2"])}}
+          ]}
+
+ Device
+ {:zen/tags #{perfbox/test}
+  :steps [{:method :get
+           :action "Device by patient"
+           :uri "/Device"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])}}
+
+          {:method :get
+           :action "Device by patient with type"
+           :uri "/Device"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :type (rand-nth ["170615005" "336621006" "337414009" "360066001" "706004007"])}}]}
+
+ DiagnosticReport
+ {:zen/tags #{perfbox/test}
+  :steps [{:method :get
+           :action "DiagnosticReport by patient"
+           :uri "/DiagnosticReport"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])}}
+
+          {:method :get
+           :action "DiagnosticReport by patient with code"
+           :uri "/DiagnosticReport"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :code (rand-nth ["34117-2" "51990-0" "24323-8" "76499-3" "58410-2"])}}
+
+          {:method :get
+           :action "DiagnosticReport by patient with category"
+           :uri "/DiagnosticReport"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :category (rand-nth ["LAB" "UNK" "34117-2"])}}
+
+          {:method :get
+           :action "DiagnosticReport by patient with date"
+           :uri "/DiagnosticReport"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :date (rand-nth ["2017-01-29" "2006" "2019-05-08" "2019" "2020-11-20"])}}
+
+
+          #_{:method :get
+           :action "DiagnosticReport by date"
+           :uri "/DiagnosticReport"
+           :params {:date (rand-nth ["2017-01-29" "2006" "2019-05-08" "2019" "2020-11-20"])}}]}
+
+ DocumentReference
+ {:zen/tags #{perfbox/test}
+  :init [{:method :post
+          :uri "/$psql"
+          :data {:query "select id, resource#>>'{type, coding,0, code}' as type,
+SUBSTR(resource#>>'{date}', 0,11) as date,
+resource#>>'{category,0, coding,0, code}' category
+from DocumentReference where random() < 0.01 limit 400;"}
+          :slot-to-store :doc-ref}]
+  :steps [{:method :get
+           :action "DocumentReference by id"
+           :uri (format "/DocumentReference/%s"
+                        (get-in persist-store [:doc-ref
+                                               (mod i (count (:doc-ref persist-store)))
+                                               :id]))}
+
+          {:method :get
+           :action "DocumentReference by patient"
+           :uri "/DocumentReference"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])}}
+
+          {:method :get
+           :action "DocumentReference by patient with type"
+           :uri "/DocumentReference"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :type (get-in persist-store [:doc-ref
+                                                 (mod i (count (:doc-ref persist-store)))
+                                                 :type])}}
+
+          {:method :get
+           :action "DocumentReference by patient with category"
+           :uri "/DocumentReference"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :category (get-in persist-store [:doc-ref
+                                                     (mod i (count (:doc-ref persist-store)))
+                                                     :category])}}
+
+          {:method :get
+           :action "DocumentReference by patient with date"
+           :uri "/DocumentReference"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :date (get-in persist-store [:doc-ref
+                                                 (mod i (count (:doc-ref persist-store)))
+                                                 :date])}}
+
+          #_{:method :get
+           :action "DocumentReference by date"
+           :uri "/DocumentReference"
+           :params {:date (get-in persist-store [:doc-ref
+                                                 (mod i (count (:doc-ref persist-store)))
+                                                 :date])}}]}
+
+ Immunization
+ {:steps [{:method :get
+           :action "Immunization by patient"
+           :uri "/Immunization"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])}}]}
+
+ ;; Location
+;;  {:zen/tags #{perfbox/test}
+;;   :init [{:method :post
+;;           :uri "/$psql"
+;;           :data {:query "select id, resource#>>'{type, coding,0, code}' as type,
+;; SUBSTR(resource#>>'{date}', 0,11) as date,
+;; resource#>>'{category,0, coding,0, code}' category
+;; from DocumentReference where random() < 0.01 limit 400;"}
+;;           :slot-to-store :doc-ref}]
+
+;;   }
+
+ MedicationRequest
+ {:zen/tags #{perfbox/test}
+  :steps [{:method :get
+           :action "MedicationRequest by patient"
+           :uri "/MedicationRequest"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])}}
+
+          {:method :get
+           :action "MedicationRequest by patient and status"
+           :uri "/MedicationRequest"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :status (rand-nth ["stopped" "active"])}}
+          {:method :get
+           :action "MedicationRequest by patient and intent"
+           :uri "/MedicationRequest"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :intent (rand-nth ["order" "unk"])}}
+          ]}
+
+
+ ExplanationOfBenefit
+ {:zen/tags #{perfbox/test}
+  :init [{:method :post
+          :uri "/$psql"
+          :data {:query "select id from explanationofbenefit where random() < 0.01 limit 5000;"}
+          :slot-to-store :eob-id}]
+  :steps [{:method :get
+           :action "ExplanationOfBenefit by id"
+           :uri (format "/ExplanationOfBenefit/%s"
+                        (get-in persist-store [:eob-id
+                                               (mod i (count (:eob-id persist-store)))
+                                               :id]))}
+
+          {:method :get
+           :action "ExplanationOfBenefit by patient"
+           :uri "/ExplanationOfBenefit"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])}}
+
+          {:method :get
+           :action "ExplanationOfBenefit by patient sort by lastUpdate"
+           :uri "/ExplanationOfBenefit"
+           :params {:patient
+                    (get-in persist-store [:patient-id
+                                           (mod i (count (:patient-id persist-store)))
+                                           :id])
+                    :_sort "_lastUpdated"}}]}
+
+
+ Observation
+ {:zen/tags #{perfbox/test}
+
+  :steps [{:method :get
+           :action "Observation by patient"
+           :uri "/Observation"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])}}
+
+          {:method :get
+           :action "Observation by patient and code"
+           :uri "/Observation"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])
+                    :code (rand-nth ["69453-9" "8310-5" "787-2" "49765-1" "38265-5" "7258-7"
+                                     "2085-9" "75626-2" "6276-0" "6106-9" "9279-1" "59460-6" "65750-2"
+                                     "72514-3" "19926-5" "39156-5" "38483-4" "44261-6" "6690-2" "8867-4"
+                                     "6248-9" "70274-6" "55758-7" "72166-2" "77606-2" "6298-4" "2093-3"
+                                     "777-3" "unk"])}}
+
+
+          #_{:method :get
+           :action "Observation by patient and date"
+           :uri "/Observation"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])
+                    :date (rand-nth ["2017-01-29" "2006" "2019-05-08" "2019" "2020-11-20"])}}
+
+          #_{:method :get
+           :action "Observation by date"
+           :uri "/Observation"
+           :params {:date (rand-nth ["2017-01-29" "2006" "2019-05-08" "2019" "2020-11-20"])}}
+
+          ]}
+
+ Encounter
+ {:zen/tags #{perfbox/test}
+
+  :steps [{:method :get
+           :action "Encounter by patient"
+           :uri "/Encounter"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])}}
+
+          {:method :get
+           :action "Encounter by patient include patient"
+           :uri "/Encounter"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])
+                    :_include "subject:Patient"}}
+
+          {:method :get
+           :action "Encounter by patient and class"
+           :uri "/Encounter"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])
+                    :class (rand-nth ["IMP" "AMB" "unk"])}}
+
+          {:method :get
+           :action "Encounter by patient and date"
+           :uri "/Encounter"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])
+                    :date (rand-nth ["2017-01-29" "gt2006" "2006" "2019-05-08" "gt2019" "gt2020-11-20"])}}
+
+          #_{:method :get
+             :action "Encounter by date"
+             :uri "/Encounter"
+             :params {:date (rand-nth ["2017-01-29" "2006" "2019-05-08" "2019" "2020-11-20"])}}
+
+          ]}
+
+ Procedure
+ {:zen/tags #{perfbox/test}
+
+  :steps [{:method :get
+           :action "Procedure by patient"
+           :uri "/Procedure"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])}}
+
+          #_{:method :get
+           :action "Procedure by patient and date"
+           :uri "/Procedure"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])
+                    :date (rand-nth ["2017" "2018" "2019"])}}
+
+          {:method :get
+           :action "Procedure by patient and code"
+           :uri "/Procedure"
+           :params {:patient (get-in persist-store [:patient-id (mod i (count (:patient-id persist-store))) :id])
+                    :code (rand-nth ["unk" "unknown" "some-code" "who-am-i"
+                                     "428211000124100" "763302001" "710824005" "430193006"
+                                     "428211000124100" "710824005" "866148006" "710824005"
+                                     "710841007"])}}
+
+          ]}
+
+ 
+;; _id identifier name birthdate gender
+ Patient
+ {:zen/tags #{perfbox/test}
+  :steps [{:method :get
+           :action "Patient by id"
+           :uri (format "/Patient/%s"
+                        (get-in persist-store [:patient-id
+                                               (mod i (count (:patient-id persist-store)))
+                                               :id]))}
+
+          {:method :get
+           :action "Patient by name"
+           :uri "/Patient"
+           :params {:name (get-in persist-store [:patient-id
+                                                 (rand-int (count (:patient-id persist-store)))
+                                                 :name])
+                    :_revinclude "Condition:patient"}}
+          {:method :get
+           :action "Patient list"
+           :uri "/Patient"}
+
+          {:method :get
+           :action "Patient by gender"
+           :uri "/Patient"
+           :params {:gender (rand-nth ["female" "male"])}}
+
+
+          {:method :get
+           :action "Patient by identifier system and value"
+           :uri "/Patient"
+           :params {:identifier
+                    (str
+                     (get-in persist-store [:patient-id
+                                            (rand-int (count (:patient-id persist-store)))
+                                            :system])
+                     "|"
+                     (get-in persist-store [:patient-id
+                                            (rand-int (count (:patient-id persist-store)))
+                                            :value]))
+                    }
+           }
+
+          {:method :get
+           :action "Patient by identifier value"
+           :uri "/Patient"
+           :params {:identifier
+                    (get-in persist-store [:patient-id
+                                           (rand-int (count (:patient-id persist-store)))
+                                           :value])}}
+
+          {:method :get
+           :action "Patient by identifier value 2"
+           :uri "/Patient"
+           :params {:identifier
+                    (get-in persist-store [:patient-id
+                                           (rand-int (count (:patient-id persist-store)))
+                                           :value_2])}}
+
+          {:method :get
+           :action "Patient by birthdate"
+           :uri "/Patient"
+           :params {:birthdate
+                    (str
+                     (rand-nth ["" "" "gt" "lt" "ge" "le"])
+                     (get-in persist-store [:patient-id
+                                            (rand-int (count (:patient-id persist-store)))
+                                            :dob]))}}
+
+
+
+          ]}
+
+
+ debug
+ {:zen/tags #{perfbox/suite}
+  :prometheus {:pushgateway ""}
+  :debug true
+  :init  [{:method :post
+           :uri "/$psql"
+           :data {:query "select id,
+resource#>>'{name,0,family}' as name,
+resource#>'{identifier, 0, value}' as value,
+resource#>'{identifier, 0, system}' as system,
+resource#>'{identifier, 2, value}' as value_2,
+resource#>'{birthDate}' as dob
+from patient where random() < 0.1 limit 100;"}
+           :slot-to-store :patient-id}]
+  :common-params {:_timeout 1
+                  :_count 5}
+  :threads [1]
+  :duration-sec 3
+  ;; :ops 1
+  :tests [
+          ;; AllergyIntolerance
+          CarePlan
+          Patient
+          Encounter]}
+
+
+ full
+ {:zen/tags #{perfbox/suite}
+  :init  [{:method :post
+           :uri "/$psql"
+           :data {:query "select id,
+resource#>>'{name,0,family}' as name,
+resource#>'{identifier, 0, value}' as value,
+resource#>'{identifier, 0, system}' as system,
+resource#>'{identifier, 2, value}' as value_2,
+resource#>'{birthDate}' as dob
+from patient where random() < 0.01 limit 10000;"}
+           :slot-to-store :patient-id}]
+  :prometheus {:pushgateway ""}
+  :common-params {:_timeout 1
+                  :_count 5}
+  :threads [4 8 16 32 #_64 #_128]
+  ;; :ops 1000
+  :duration-sec 180
+  ;; :debug true
+  ;; :threads [1]
+  ;; :ops 1
+
+  :tests [AllergyIntolerance
+          CarePlan
+          CareTeam
+          Condition
+          Device
+          DiagnosticReport
+          DocumentReference
+          Immunization
+          MedicationRequest
+          Observation
+          Patient
+          Encounter
+          ExplanationOfBenefit
+          Procedure]}
+
+ full-by-one
+ {:zen/tags #{perfbox/suite}
+  :init  [{:method :post
+           :uri "/$psql"
+           :data {:query "select id,
+resource#>>'{name,0,family}' as name,
+resource#>'{identifier, 0, value}' as value,
+resource#>'{identifier, 0, system}' as system,
+resource#>'{identifier, 2, value}' as value_2,
+resource#>'{birthDate}' as dob
+from patient where random() < 0.01 limit 10000;"}
+           :slot-to-store :patient-id}]
+  :prometheus {:pushgateway ""}
+  :common-params {:_timeout 1
+                  :_count 30}
+  ;; :threads [16 32 64 128]
+  ;; :ops 2000
+
+  ;; :debug true
+  :threads [8 16 32 64 128]
+  :ops 5000
+
+  :tests [Patient]}
+
+
+ aidbox
+ {:zen/tags #{perfbox/subject}
+  :zen/desc "Test aidbox"
+  :url "http://localhost:8765"
+  :basic-auth ["root" "secret"] ;; [(env :AIDBOX_CLIENT_ID) (env :AIDBOX_CLIENT_SECRET)]
+  :suites #{suite}}
+
+ hapi
+ {:zen/tags #{perfbox/subject}
+  :zen/desc "Test HAPI"
+  :url "http://localhost:8090"
+  :prefix "/fhir"
+  :suites #{suite}}}

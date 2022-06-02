@@ -1,0 +1,25 @@
+{ns perfbox.loader
+
+ basic-op
+ {:steps [{:method :get :uri  "/Patient"}]}
+
+ suite
+ {:zen/tags #{perfbox/suite}
+  :prometheus {:pushgateway ""}
+  :threads [2 4 8 16 32]
+  ;;:number-of-ops 100
+  :duration-sec 120 ;; sec
+  :tests [basic-op]}
+
+ aidbox
+ {:zen/desc "Test aidbox"
+  :url "http://localhost:8765"
+  :basic-auth [(env :AIDBOX_CLIENT_ID) (env :AIDBOX_CLIENT_SECRET)]
+  :suites #{suite}}
+
+ hapi
+ {:zen/desc "Test HAPI"
+  :description ""
+  :url ""
+  :basic-auth ["" ""]
+  :suites #{suite}}}

@@ -1,0 +1,25 @@
+{:paths   ["src" "resources"]
+
+ :deps    {org.clojure/clojure       {:mvn/version "1.10.3"}
+           clj-commons/clj-ssh       {:mvn/version "0.5.15"}
+           borkdude/edamame          {:mvn/version "0.0.19"}
+           clj-chrome-devtools/clj-chrome-devtools {:mvn/version "20220405"}
+           clj-commons/clj-yaml      {:mvn/version "0.7.106"}
+           cheshire/cheshire         {:mvn/version "5.10.1"}
+           stylefruits/gniazdo {:mvn/version "1.2.0"}
+           http-kit/http-kit         {:mvn/version "2.5.3"}
+           org.clojure/java.jdbc     {:mvn/version "0.7.12"}
+           org.postgresql/postgresql {:mvn/version "42.2.22.jre7"}}
+
+ :aliases
+ {:cider/nrepl
+  {:extra-paths []
+   :extra-deps  {nrepl/nrepl                    {:mvn/version "0.8.3"}
+                 cider/cider-nrepl              {:mvn/version "LATEST"}
+                 babashka/process               {:mvn/version "0.0.2"}
+                 refactor-nrepl/refactor-nrepl  {:mvn/version "2.5.1"}}
+   :jvm-opts    ["-XX:-OmitStackTraceInFastThrow"]
+   :main-opts   ["-m"
+                 "nrepl.cmdline"
+                 "--middleware"
+                 "[refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"]}}}
